@@ -6,4 +6,4 @@ from .interfaces import (
     IMessageAdapter,
 )
 from .utils import Hashable
-from .listeners import Listener, DistributingListener, Listeners
+from .listeners import Listener, DistributingListener, Listeners, UnhashableListeners
