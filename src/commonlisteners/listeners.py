@@ -80,7 +80,9 @@ class DistributingListener(IListener, Hashable):
 
 class UnhashableListeners:
     """
-    Registry of local listeners
+    Registry of local listeners.
+    It is not possible to subscribe listener more than once.
+    Order of message sending is garanteed.
     """
     REGISTRY_TYPE = list
     ADD_METHOD = 'append'
@@ -117,7 +119,10 @@ class UnhashableListeners:
 
 class Listeners(UnhashableListeners):
     """
-    Registry of local listeners
+    Registry of local hashable listeners.
+    Subscribe and unsubscribe works faster than in UnhashableListeners.
+    It is not possible to subscribe listener more than once.
+    Order of message sending is not garanteed.
     """
     REGISTRY_INITIALIZATOR = set
     ADD_METHOD = 'add'
