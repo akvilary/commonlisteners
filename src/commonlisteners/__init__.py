@@ -5,4 +5,5 @@ from .interfaces import (
     IListener,
     IMessageAdapter,
 )
+from .utils import Hashable
 from .listeners import Listener, DistributingListener, Listeners

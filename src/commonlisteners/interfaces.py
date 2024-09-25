@@ -1,6 +1,6 @@
 # coding=utf-8
 """
-Listeners
+Interfaces
 """
 
 from abc import abstractmethod
