@@ -80,10 +80,10 @@ class DistributingListener(IListener, Hashable):
 
 class UnhashableListeners:
     """
-    Registry of local listeners.
-    Subscribe and unsubscribe works slower than in Listeners.
+    Registry of local unhashable listeners.
+    Subscribe and unsubscribe works slower than in Listeners 
+    but it does not require __hash__ method implementation of listeners.
     It is not possible to subscribe listener more than once.
-    Order of message sending is garanteed.
     """
     REGISTRY_TYPE = list
     ADD_METHOD = 'append'
@@ -121,7 +121,8 @@ class UnhashableListeners:
 class Listeners(UnhashableListeners):
     """
     Registry of local hashable listeners.
-    Subscribe and unsubscribe works faster than in UnhashableListeners.
+    Subscribe and unsubscribe works faster than in UnhashableListeners
+    but it does require __hash__ method implementation of listeners.
     It is not possible to subscribe listener more than once.
     Order of message sending is not garanteed.
     """
