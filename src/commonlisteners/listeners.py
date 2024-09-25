@@ -81,6 +81,7 @@ class DistributingListener(IListener, Hashable):
 class UnhashableListeners:
     """
     Registry of local listeners.
+    Subscribe and unsubscribe works slower than in Listeners.
     It is not possible to subscribe listener more than once.
     Order of message sending is garanteed.
     """
