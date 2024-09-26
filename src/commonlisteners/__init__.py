@@ -1,9 +1,8 @@
 from .interfaces import (
     IMessageTransmitter,
-    IMessageDistributingTransmitter,
+    IMessageForSubscriberTransmitter,
     IErrorsReciever,
     IListener,
     IMessageAdapter,
 )
-from .utils import Hashable
-from .listeners import Listener, DistributingListener, Listeners, UnhashableListeners
+from .listeners import Listener, Listeners, UnhashableListeners, MultiSubscriberListener

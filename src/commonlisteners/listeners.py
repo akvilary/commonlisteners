@@ -8,15 +8,14 @@ from typing import Any, List, Optional, Iterable
 from .interfaces import (
     IListener,
     IMessageTransmitter,
-    IMessageDistributingTransmitter,
+    IMessageForSubscriberTransmitter,
     IErrorsReciever,
     IMessageAdapter,
 )
-from .utils import Hashable
 
 
 @dataclass
-class Listener(IListener, Hashable):
+class Listener(IListener):
     """
     Hashable listener that can get and transmitt message.
     Args:
@@ -26,6 +25,9 @@ class Listener(IListener, Hashable):
 
     message_transmitter: IMessageTransmitter
     message_transmitter_errors_receiver: Optional[IErrorsReciever] = None
+
+    def __hash__(self):
+        return id(self)
 
     def listen(self, message: Any):
         """
@@ -39,28 +41,30 @@ class Listener(IListener, Hashable):
 
 
 @dataclass
-class DistributingListener(IListener, Hashable):
+class MultiSubscriberListener(IListener):
     """
-    Hashable listener that can get, adapt message and distribute it to instances of subscribers.
+    Hashable listener that can adapt message and distribute it to instances of subscribers.
     Args:
-        message_transmitter: has to support __call__(self, subscriber: Any, message: Any) interface.
+        message_transmitter: has to support __call__(self, subcsriber: Any, message: Any) interface.
         message_transmitter_errors_receiver (optional): has to support __call__(self, exc: Exception) interface.
         subscribers (optional, but useless without it): list of instances. Message will be distributed to each instance by message_transmitter.
         message_adapter (optional): has to support __call__(self, message: Any) interface.
         message_adapter_errors_receiver (optional): has to support __call__(self, exc: Exception) interface.
     """
-
-    message_transmitter: IMessageDistributingTransmitter
+    message_transmitter: IMessageForSubscriberTransmitter
     message_transmitter_errors_receiver: Optional[IErrorsReciever] = None
     subscribers: List[Any] = field(default_factory=list)
     message_adapter: Optional[IMessageAdapter] = None
     message_adapter_errors_receiver: Optional[IErrorsReciever] = None
 
+    def __hash__(self):
+        return id(self)
+
     def listen(self, message: Any):
         """
         Listen message and distribute it to subcribers
         """
-        if self. subscribers:
+        if self.subscribers:
             if self.message_adapter:
                 try:
                     message = self.message_adapter(message)
@@ -91,6 +95,15 @@ class UnhashableListeners:
 
     def __init__(self, listeners: Optional[Iterable[IListener]] = None):
         self.registry = self.REGISTRY_TYPE(listeners or [])
+
+    def __bool__(self):
+        return bool(self.registry)
+
+    def __iter__(self):
+        return iter(self.registry)
+
+    def __len__(self):
+        return len(self.registry)
 
     def subscribe(self, listener: Any):
         """
@@ -126,5 +139,5 @@ class Listeners(UnhashableListeners):
     It is not possible to subscribe listener more than once.
     Order of message sending is not garanteed.
     """
-    REGISTRY_INITIALIZATOR = set
+    REGISTRY_TYPE = set
     ADD_METHOD = 'add'

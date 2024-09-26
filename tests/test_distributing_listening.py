@@ -1,8 +1,8 @@
 from helpers import ResultSaver, TransmitterErrorsReciever
-from commonlisteners import DistributingListener, Listeners
+from commonlisteners import MultiSubscriberListener, Listeners
 
 
-def transmitter_for_distributing_testing(instance: ResultSaver, message: int):
+def transmitter_for_multiobject_listener(instance: ResultSaver, message: int):
     instance.result = instance.result / message
 
 
@@ -12,8 +12,8 @@ def test_distributing_listening():
     """
     subscriber = ResultSaver(result=100)
     transmitter_errors_reciever = TransmitterErrorsReciever()
-    listener = DistributingListener(
-        message_transmitter=transmitter_for_distributing_testing,
+    listener = MultiSubscriberListener(
+        message_transmitter=transmitter_for_multiobject_listener,
         message_transmitter_errors_receiver=transmitter_errors_reciever,
         subscribers=[subscriber],
     )

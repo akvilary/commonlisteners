@@ -1,24 +1,25 @@
 from helpers import (
-    ResultForTesting,
-    TransmitterToResultForTesting,
+    ResultSaver,
     TransmitterErrorsReciever,
     reraise,
 )
-from commonlisteners import Listener, Listeners
+from commonlisteners import Listeners, MultiSubscriberListener
+
+
+def transmitter_for_multiobject_listener(instance: ResultSaver, message: int):
+    instance.result = instance.result / message
 
 
 def test_ignore_reraised_errors():
     """
     Ignore reraised errors
     """
-    instance = ResultForTesting(result=100)
+    instance = ResultSaver(result=100)
     transmitter_errors_reciever = TransmitterErrorsReciever(handlers=[reraise])
-    listener = Listener(
-        message_transmitter=TransmitterToResultForTesting(
-            lambda instance, message: instance.result / message
-        ),
-        instances=[instance],
+    listener = MultiSubscriberListener(
+        message_transmitter=transmitter_for_multiobject_listener,
         message_transmitter_errors_receiver=transmitter_errors_reciever,
+        subscribers=[instance],
     )
     listeners = Listeners([listener])
     message = 0

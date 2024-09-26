@@ -4,7 +4,6 @@ Interfaces
 """
 
 from abc import abstractmethod
-from dataclasses import dataclass
 from typing import Any, Protocol
 
 
@@ -14,9 +13,9 @@ class IMessageTransmitter(Protocol):
         raise NotImplementedError()
 
 
-class IMessageDistributingTransmitter(Protocol):
+class IMessageForSubscriberTransmitter(Protocol):
     @abstractmethod
-    def __call__(self, instance: Any, message: Any):
+    def __call__(self, subscriber: Any, message: Any):
         raise NotImplementedError()
 
 
@@ -32,7 +31,6 @@ class IMessageAdapter(Protocol):
         raise NotImplementedError()
 
 
-@dataclass
 class IListener:
     """
     Class can get and adapt message for instances
