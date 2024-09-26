@@ -1,12 +1,12 @@
 from typing import Callable, List, Optional
 
 
-class ResultSaver:
+class ResultKeeper:
     def __init__(self, result):
         self.result = result
 
 
-class TransmitterErrorsReciever:
+class TransmitterErrorsKeeper:
     def __init__(self, handlers: Optional[List[Callable]] = None):
         self.exceptions = []
         self.handlers = handlers or []

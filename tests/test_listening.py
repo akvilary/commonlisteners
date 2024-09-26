@@ -1,4 +1,4 @@
-from helpers import TransmitterErrorsReciever
+from helpers import TransmitterErrorsKeeper
 from commonlisteners import Listener, Listeners
 
 
@@ -6,7 +6,7 @@ def test_listening():
     """
     Ignore reraised errors
     """
-    transmitter_errors_reciever = TransmitterErrorsReciever()
+    transmitter_errors_reciever = TransmitterErrorsKeeper()
     messages = []
     listener = Listener(
         message_transmitter=lambda message: messages.append(message),

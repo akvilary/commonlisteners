@@ -17,7 +17,7 @@ from .interfaces import (
 @dataclass
 class Listener(IListener):
     """
-    Hashable listener that can get and transmitt message.
+    Listener that can get and transmitt message.
     Args:
         message_transmitter: has to support __call__(self, message: Any) interface.
         message_transmitter_errors_receiver (optional): has to support __call__(self, exc: Exception) interface.
@@ -25,9 +25,6 @@ class Listener(IListener):
 
     message_transmitter: IMessageTransmitter
     message_transmitter_errors_receiver: Optional[IErrorsReciever] = None
-
-    def __hash__(self):
-        return id(self)
 
     def listen(self, message: Any):
         """
@@ -43,7 +40,7 @@ class Listener(IListener):
 @dataclass
 class MultiSubscriberListener(IListener):
     """
-    Hashable listener that can adapt message and distribute it to instances of subscribers.
+    Listener that can adapt message and distribute it to instances of subscribers.
     Args:
         message_transmitter: has to support __call__(self, subcsriber: Any, message: Any) interface.
         message_transmitter_errors_receiver (optional): has to support __call__(self, exc: Exception) interface.
@@ -56,9 +53,6 @@ class MultiSubscriberListener(IListener):
     subscribers: List[Any] = field(default_factory=list)
     message_adapter: Optional[IMessageAdapter] = None
     message_adapter_errors_receiver: Optional[IErrorsReciever] = None
-
-    def __hash__(self):
-        return id(self)
 
     def listen(self, message: Any):
         """
@@ -82,25 +76,20 @@ class MultiSubscriberListener(IListener):
                     continue
 
 
-class UnhashableListeners:
+class Listeners:
     """
-    Registry of local unhashable listeners.
-    Subscribe and unsubscribe works slower than in Listeners 
-    but it does not require __hash__ method implementation of listeners.
+    Registry of local listeners.
     It is not possible to subscribe listener more than once.
     """
-    REGISTRY_TYPE = list
-    ADD_METHOD = 'append'
-    REMOVE_METHOD = 'remove'
 
     def __init__(self, listeners: Optional[Iterable[IListener]] = None):
-        self.registry = self.REGISTRY_TYPE(listeners or [])
+        self.registry = {id(x): x for x in listeners or []}
 
     def __bool__(self):
         return bool(self.registry)
 
     def __iter__(self):
-        return iter(self.registry)
+        return iter(self.registry.values())
 
     def __len__(self):
         return len(self.registry)
@@ -109,35 +98,25 @@ class UnhashableListeners:
         """
         Subscribe listener
         """
-        if not listener in self.registry:
-            getattr(self.registry, self.ADD_METHOD)(listener)
+        listener_id = id(listener)
+        if not listener_id in self.registry:
+            self.registry[listener_id] = listener
 
     def unsubscribe(self, listener: Any):
         """
         Unsubscribe listener
         """
-        if listener in self.registry:
-            getattr(self.registry, self.REMOVE_METHOD)(listener)
+        listener_id = id(listener)
+        if listener_id in self.registry:
+            del self.registry[listener_id]
 
     def send_message(self, message: Any):
         """
         Send message for listeners
         """
-        for listener in self.registry:
+        for listener in self:
             # protection from reraise of errors receivers
             try:
                 listener.listen(message)
             except Exception:  # pylint: disable=broad-exception-caught
                 continue
-
-
-class Listeners(UnhashableListeners):
-    """
-    Registry of local hashable listeners.
-    Subscribe and unsubscribe works faster than in UnhashableListeners
-    but it does require __hash__ method implementation of listeners.
-    It is not possible to subscribe listener more than once.
-    Order of message sending is not garanteed.
-    """
-    REGISTRY_TYPE = set
-    ADD_METHOD = 'add'

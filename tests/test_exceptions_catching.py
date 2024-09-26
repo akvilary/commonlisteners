@@ -1,12 +1,12 @@
 from helpers import (
-    ResultSaver,
-    TransmitterErrorsReciever,
+    ResultKeeper,
+    TransmitterErrorsKeeper,
     reraise,
 )
 from commonlisteners import Listeners, MultiSubscriberListener
 
 
-def transmitter_for_multiobject_listener(instance: ResultSaver, message: int):
+def the_transmitter(instance: ResultKeeper, message: int):
     instance.result = instance.result / message
 
 
@@ -14,10 +14,10 @@ def test_ignore_reraised_errors():
     """
     Ignore reraised errors
     """
-    instance = ResultSaver(result=100)
-    transmitter_errors_reciever = TransmitterErrorsReciever(handlers=[reraise])
+    instance = ResultKeeper(result=100)
+    transmitter_errors_reciever = TransmitterErrorsKeeper(handlers=[reraise])
     listener = MultiSubscriberListener(
-        message_transmitter=transmitter_for_multiobject_listener,
+        message_transmitter=the_transmitter,
         message_transmitter_errors_receiver=transmitter_errors_reciever,
         subscribers=[instance],
     )

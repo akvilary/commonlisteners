@@ -1,8 +1,8 @@
-from helpers import ResultSaver, TransmitterErrorsReciever
+from helpers import ResultKeeper, TransmitterErrorsKeeper
 from commonlisteners import MultiSubscriberListener, Listeners
 
 
-def transmitter_for_multiobject_listener(instance: ResultSaver, message: int):
+def the_transmitter(instance: ResultKeeper, message: int):
     instance.result = instance.result / message
 
 
@@ -10,10 +10,10 @@ def test_distributing_listening():
     """
     Ignore reraised errors
     """
-    subscriber = ResultSaver(result=100)
-    transmitter_errors_reciever = TransmitterErrorsReciever()
+    subscriber = ResultKeeper(result=100)
+    transmitter_errors_reciever = TransmitterErrorsKeeper()
     listener = MultiSubscriberListener(
-        message_transmitter=transmitter_for_multiobject_listener,
+        message_transmitter=the_transmitter,
         message_transmitter_errors_receiver=transmitter_errors_reciever,
         subscribers=[subscriber],
     )
