@@ -98,17 +98,13 @@ class Listeners:
         """
         Subscribe listener
         """
-        listener_id = id(listener)
-        if not listener_id in self.registry:
-            self.registry[listener_id] = listener
+        self.registry[id(listener)] = listener
 
     def unsubscribe(self, listener: Any):
         """
         Unsubscribe listener
         """
-        listener_id = id(listener)
-        if listener_id in self.registry:
-            del self.registry[listener_id]
+        self.registry.pop(id(listener), None)
 
     def send_message(self, message: Any):
         """
