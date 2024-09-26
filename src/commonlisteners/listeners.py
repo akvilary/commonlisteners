@@ -79,7 +79,7 @@ class MultiSubscriberListener(IListener):
 class Listeners:
     """
     Registry of local listeners.
-    It is not possible to subscribe listener more than once.
+    It is not possible to subscribe each listener more than once.
     """
 
     def __init__(self, listeners: Optional[Iterable[IListener]] = None):
